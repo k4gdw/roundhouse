@@ -1,3 +1,4 @@
+using System;
 using roundhouse.infrastructure.logging;
 
 namespace roundhouse.databases.sqlserver2000
@@ -13,6 +14,17 @@ namespace roundhouse.databases.sqlserver2000
         public override string sql_statement_separator_regex_pattern
         {
             get { return @"(?<KEEP1>^(?:.)*(?:-{2}).*$)|(?<KEEP1>/{1}\*{1}[\S\s]*?\*{1}/{1})|(?<KEEP1>'{1}(?:[^']|\n[^'])*?'{1})|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>\s)|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>$)"; }
+        }
+        
+        public override string set_backup_database_script()
+        {
+            return string.Format(
+                @"USE master
+                    BACKUP DATABASE [{0}]
+                    TO DISK='RoundhousE_{1}_{0}.bak';",
+                                                      database_name,
+                                                      String.Format("{0:d-M-yyyy_HH:mm:ss}",
+                                                      DateTime.UtcNow));
         }
 
         public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
@@ -47,6 +59,7 @@ namespace roundhouse.databases.sqlserver2000
                 }
             }
 
+        
 
             if (connect_options == "Integrated Security")
             {

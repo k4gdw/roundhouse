@@ -29,6 +29,17 @@
         //    }
         //}
 
+
+
+        public override string set_backup_database_script()
+        {
+
+            Log.bound_to(this).log_a_warning_event_containing(
+                    "{0} with provider {1} does not provide a facility for backing up a database at this time.{2}",
+                    GetType(), provider, Environment.NewLine);
+            return "";
+        }
+
         public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
         {
             server_name = "sqlite";

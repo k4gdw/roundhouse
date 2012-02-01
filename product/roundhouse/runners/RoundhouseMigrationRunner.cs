@@ -60,6 +60,12 @@ namespace roundhouse.runners
         public void run()
         {
             database_migrator.initialize_connections();
+            Log.bound_to(this).log_an_info_event_containing("Backing up database {0} to default location on {1}.",
+                                                            database_migrator.database.database_name,
+                                                            database_migrator.database.server_name
+                                                            );
+
+            database_migrator.backup_database_if_it_exists();
 
             Log.bound_to(this).log_an_info_event_containing("Running {0} v{1} against {2} - {3}.",
                                                             ApplicationParameters.name,

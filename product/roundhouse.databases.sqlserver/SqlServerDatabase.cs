@@ -142,6 +142,17 @@ namespace roundhouse.databases.sqlserver
                 database_name, simple ? "SIMPLE" : "FULL");
         }
 
+        public override string set_backup_database_script()
+        {
+            return string.Format(
+                @"USE master
+                    BACKUP DATABASE [{0}]
+                    TO DISK='RoundhousE_{1}_{0}.bak';",
+                                                      database_name,
+                                                      String.Format("{0:d-M-yyyy_HH:mm:ss}",
+                                                      DateTime.UtcNow));
+        }
+
         public override string restore_database_script(string restore_from_path, string custom_restore_options)
         {
             string restore_options = string.Empty;

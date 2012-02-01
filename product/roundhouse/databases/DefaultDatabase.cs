@@ -83,7 +83,7 @@ namespace roundhouse.databases
         public abstract string set_recovery_mode_script(bool simple);
         public abstract string restore_database_script(string restore_from_path, string custom_restore_options);
         public abstract string delete_database_script();
-
+        public abstract string set_backup_database_script();
         public virtual bool create_database_if_it_doesnt_exist(string custom_create_database_script)
         {
             bool database_was_created = false;
@@ -154,12 +154,16 @@ namespace roundhouse.databases
 
         public void backup_database(string output_path_minus_database)
         {
-            Log.bound_to(this).log_a_warning_event_containing("{0} with provider {1} does not provide a facility for backing up a database at this time.",
-                                                              GetType(), provider);
-            //todo: backup database is not a script - it is a command
-            //Server sql_server =
-            //    new Server(new ServerConnection(new SqlConnection(build_connection_string(server_name, database_name))));
-            //sql_server.BackupDevices.Add(new BackupDevice(sql_server,database_name));
+            try
+            {
+                run_sql(set_backup_database_script(), ConnectionType.Admin);
+            }
+            catch (Exception ex)
+            {
+                Log.bound_to(this).log_a_warning_event_containing(
+                    "{0} with provider {1} does not provide a facility for backing up the database at this time.{2}{3}",
+                    GetType(), provider, Environment.NewLine, ex.Message);
+            }
         }
 
         public void restore_database(string restore_from_path, string custom_restore_options)
