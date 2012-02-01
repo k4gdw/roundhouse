@@ -15,15 +15,19 @@ namespace roundhouse.databases.sqlserver2000
         {
             get { return @"(?<KEEP1>^(?:.)*(?:-{2}).*$)|(?<KEEP1>/{1}\*{1}[\S\s]*?\*{1}/{1})|(?<KEEP1>'{1}(?:[^']|\n[^'])*?'{1})|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>\s)|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>$)"; }
         }
-        
+
         public override string set_backup_database_script()
         {
             return string.Format(
-                @"USE master
-                    BACKUP DATABASE [{0}]
-                    TO DISK='RoundhousE_{1}_{0}.bak';",
+                @"USE master;
+                IF EXISTS(SELECT name
+		                  FROM master.dbo.sysdatabases
+		                  WHERE name = '{0}')
+	                BEGIN
+		                BACKUP DATABASE [{0}] TO DISK = 'RoundhousE_{1}_{0}.bak'
+	                END;",
                                                       database_name,
-                                                      String.Format("{0:d-M-yyyy_HH:mm:ss}",
+                                                      String.Format("{0:yyyymmdd_HHmmss}",
                                                       DateTime.UtcNow));
         }
 
@@ -36,12 +40,12 @@ namespace roundhouse.databases.sqlserver2000
                 {
                     if (string.IsNullOrEmpty(server_name) && (part.to_lower().Contains("server") || part.to_lower().Contains("data source")))
                     {
-                        server_name = part.Substring(part.IndexOf("=") + 1);
+                        server_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
 
                     if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("initial catalog") || part.to_lower().Contains("database")))
                     {
-                        database_name = part.Substring(part.IndexOf("=") + 1);
+                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
                 }
 

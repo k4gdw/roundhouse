@@ -27,7 +27,7 @@ namespace roundhouse.databases.oracle
         public override string set_backup_database_script()
         {
             //todo:  implement backup script for Oracle
-            Log.bound_to(this).log_a_warning_event_containing(
+            Log.bound_to(this).log_an_info_event_containing(
                     "{0} with provider {1} does not provide a facility for backing up a database at this time.{2}",
                     GetType(), provider, Environment.NewLine);
             return "";
@@ -42,7 +42,7 @@ namespace roundhouse.databases.oracle
                 {
                     if (string.IsNullOrEmpty(server_name) && part.to_lower().Contains("data source"))
                     {
-                        database_name = part.Substring(part.IndexOf("=") + 1);
+                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
 
                     //if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("user id")))
@@ -105,7 +105,7 @@ namespace roundhouse.databases.oracle
             run_sql(create_sequence_script(scripts_run_errors_table_name), ConnectionType.Default);
         }
 
-        public string create_sequence_script(string table_name)
+        private string create_sequence_script(string table_name)
         {
             return string.Format(
                 @"
@@ -156,7 +156,7 @@ namespace roundhouse.databases.oracle
             Log.bound_to(this).log_a_debug_event_containing("Replacing \r\n with \n to be compliant with Oracle.");
             //http://www.barrydobson.com/2009/02/17/pls-00103-encountered-the-symbol-when-expecting-one-of-the-following/
             sql_to_run = sql_to_run.Replace("\r\n", "\n");
-            object return_value = new object();
+            var return_value = new object();
 
             if (string.IsNullOrEmpty(sql_to_run)) return return_value;
 
@@ -190,7 +190,7 @@ namespace roundhouse.databases.oracle
             return new AdoNetParameter(parameter);
         }
 
-        public string insert_version_script()
+        private string insert_version_script()
         {
             return string.Format(
                 @"
@@ -212,7 +212,7 @@ namespace roundhouse.databases.oracle
                 roundhouse_schema_name, version_table_name);
         }
 
-        public string get_version_id_script()
+        private string get_version_id_script()
         {
             return string.Format(
                 @"

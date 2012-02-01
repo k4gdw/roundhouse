@@ -26,12 +26,12 @@ namespace roundhouse.databases.sqlserver
                 {
                     if (string.IsNullOrEmpty(server_name) && (part.to_lower().Contains("server") || part.to_lower().Contains("data source")))
                     {
-                        server_name = part.Substring(part.IndexOf("=") + 1);
+                        server_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
 
                     if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("initial catalog") || part.to_lower().Contains("database")))
                     {
-                        database_name = part.Substring(part.IndexOf("=") + 1);
+                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
                 }
 
@@ -88,22 +88,12 @@ namespace roundhouse.databases.sqlserver
             //TODO: Delete RoundhousE user if it exists (i.e. migration from SQL2000 to 2005)
         }
 
-        public void create_roundhouse_schema_if_it_doesnt_exist()
+        private void create_roundhouse_schema_if_it_doesnt_exist()
         {
-            try
-            {
-                run_sql(create_roundhouse_schema_script(),ConnectionType.Default);
-            }
-            catch (Exception ex)
-            {
-                throw;
-                //Log.bound_to(this).log_a_warning_event_containing(
-                //    "Either the schema has already been created OR {0} with provider {1} does not provide a facility for creating roundhouse schema at this time.{2}{3}",
-                //    GetType(), provider, Environment.NewLine, ex.Message);
-            }
+            run_sql(create_roundhouse_schema_script(),ConnectionType.Default);
         }
 
-        public string create_roundhouse_schema_script()
+        private string create_roundhouse_schema_script()
         {
             return string.Format(
                 @"
@@ -145,17 +135,21 @@ namespace roundhouse.databases.sqlserver
         public override string set_backup_database_script()
         {
             return string.Format(
-                @"USE master
-                    BACKUP DATABASE [{0}]
-                    TO DISK='RoundhousE_{1}_{0}.bak';",
+                @"USE master;
+                IF EXISTS(SELECT name
+		                  FROM master.dbo.sysdatabases
+		                  WHERE name = '{0}')
+	                BEGIN
+		                BACKUP DATABASE [{0}] TO DISK = 'RoundhousE_{1}_{0}.bak'
+	                END;",
                                                       database_name,
-                                                      String.Format("{0:d-M-yyyy_HH:mm:ss}",
+                                                      String.Format("{0:yyyymmdd_HHmmss}",
                                                       DateTime.UtcNow));
         }
 
         public override string restore_database_script(string restore_from_path, string custom_restore_options)
         {
-            string restore_options = string.Empty;
+            string restore_options;
             if (!string.IsNullOrEmpty(custom_restore_options))
             {
                 restore_options = custom_restore_options.to_lower().StartsWith(",") ? custom_restore_options : ", " + custom_restore_options;
@@ -186,7 +180,7 @@ namespace roundhouse.databases.sqlserver
 
         public string get_default_restore_move_options()
         {
-            StringBuilder restore_options = new StringBuilder();
+            var restore_options = new StringBuilder();
             DataTable dt = execute_datatable("select [name],[physical_name] from sys.database_files");
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -221,13 +215,13 @@ namespace roundhouse.databases.sqlserver
         /// </summary>
         private DataTable execute_datatable(string sql_to_run)
         {
-            DataSet result = new DataSet();
+            var result = new DataSet();
 
             using (IDbCommand command = setup_database_command(sql_to_run,ConnectionType.Default,null))
             {
                 using (IDataReader data_reader = command.ExecuteReader())
                 {
-                    DataTable data_table = new DataTable();
+                    var data_table = new DataTable();
                     data_table.Load(data_reader);
                     data_reader.Close();
                     data_reader.Dispose();

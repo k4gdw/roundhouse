@@ -60,12 +60,7 @@ namespace roundhouse.runners
         public void run()
         {
             database_migrator.initialize_connections();
-            Log.bound_to(this).log_an_info_event_containing("Backing up database {0} to default location on {1}.",
-                                                            database_migrator.database.database_name,
-                                                            database_migrator.database.server_name
-                                                            );
-
-            database_migrator.backup_database_if_it_exists();
+            BackupDatabase();
 
             Log.bound_to(this).log_an_info_event_containing("Running {0} v{1} against {2} - {3}.",
                                                             ApplicationParameters.name,
@@ -181,6 +176,7 @@ namespace roundhouse.runners
                 else
                 {
                     database_migrator.open_admin_connection();
+                    BackupDatabase();
                     database_migrator.delete_database();
                     database_migrator.close_admin_connection();
                     database_migrator.close_connection();
@@ -208,6 +204,16 @@ namespace roundhouse.runners
                 database_migrator.database.Dispose();
                 //copy_log_file_to_change_drop_folder();
             }
+        }
+
+        private void BackupDatabase()
+        {
+            Log.bound_to(this).log_an_info_event_containing("Backing up database {0} to default location on {1}.",
+                                                            database_migrator.database.database_name,
+                                                            database_migrator.database.server_name
+                );
+
+            database_migrator.backup_database_if_it_exists();
         }
 
         public void log_and_traverse(MigrationsFolder folder, long version_id, string new_version, ConnectionType connection_type)

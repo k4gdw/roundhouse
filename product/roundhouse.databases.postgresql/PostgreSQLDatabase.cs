@@ -7,7 +7,6 @@ namespace roundhouse.databases.postgresql
     using infrastructure.app;
     using infrastructure.extensions;
     using infrastructure.logging;
-    using Npgsql;
 
     public class PostgreSQLDatabase : AdoNetDatabase
     {
@@ -36,7 +35,7 @@ namespace roundhouse.databases.postgresql
         public override string set_backup_database_script()
         {
 
-            Log.bound_to(this).log_a_warning_event_containing(
+            Log.bound_to(this).log_an_info_event_containing(
                     "{0} with provider {1} does not provide a facility for backing up a database at this time.{2}",
                     GetType(), provider, Environment.NewLine);
             return "";
@@ -51,12 +50,12 @@ namespace roundhouse.databases.postgresql
                 {
                     if (string.IsNullOrEmpty(server_name) && (part.to_lower().Contains("server") || part.to_lower().Contains("data source")))
                     {
-                        server_name = part.Substring(part.IndexOf("=") + 1);
+                        server_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
 
                     if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("database") || part.to_lower().Contains("database")))
                     {
-                        database_name = part.Substring(part.IndexOf("=") + 1);
+                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
                     }
                 }
             }
@@ -75,11 +74,11 @@ namespace roundhouse.databases.postgresql
             if (string.IsNullOrEmpty(connection_string))
             {
                 InteractivePrompt.write_header(configuration_property_holder);
-                var user_name = InteractivePrompt.get_user("postgres", configuration_property_holder);
+                var userName = InteractivePrompt.get_user("postgres", configuration_property_holder);
                 var password = InteractivePrompt.get_password("postgres", configuration_property_holder);
                 InteractivePrompt.write_footer();
 
-                connection_string = build_connection_string(server_name, database_name, user_name, password);
+                connection_string = build_connection_string(server_name, database_name, userName, password);
             }
 
             configuration_property_holder.ConnectionString = connection_string;
