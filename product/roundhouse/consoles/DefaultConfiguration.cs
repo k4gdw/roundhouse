@@ -5,8 +5,15 @@ namespace roundhouse.consoles
     using infrastructure.app;
     using infrastructure.logging;
 
+
     public sealed class DefaultConfiguration : ConfigurationPropertyHolder
     {
+
+    	public DefaultConfiguration()
+    	{
+    		BackupDatabase = true;
+    	}
+
         public Logger Logger { get; set; }
         public string ServerName { get; set; }
         public string DatabaseName { get; set; }
@@ -56,5 +63,6 @@ namespace roundhouse.consoles
         public bool DisableTokenReplacement { get; set; }
         public bool SearchAllSubdirectoriesInsteadOfTraverse { get; set; }
         public bool DisableOutput { get; set; }
+    	public bool BackupDatabase { get; set; }
     }
 }

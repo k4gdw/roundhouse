@@ -28,6 +28,7 @@ namespace roundhouse.runners
         private readonly bool use_simple_recovery;
         private readonly ConfigurationPropertyHolder configuration;
         private const string SQL_EXTENSION = "*.sql";
+    	private bool _backupComplete = false;
 
         public RoundhouseMigrationRunner(
             string repository_path,
@@ -60,7 +61,6 @@ namespace roundhouse.runners
         public void run()
         {
             database_migrator.initialize_connections();
-            BackupDatabase();
 
             Log.bound_to(this).log_an_info_event_containing("Running {0} v{1} against {2} - {3}.",
                                                             ApplicationParameters.name,
@@ -133,7 +133,11 @@ namespace roundhouse.runners
                     Log.bound_to(this).log_an_info_event_containing("{0}", "=".PadRight(50, '='));
 
                     database_migrator.open_admin_connection();
-                    log_and_traverse(known_folders.alter_database, version_id, new_version, ConnectionType.Admin);
+					if (configuration.BackupDatabase)
+					{
+						BackupDatabase();
+					}
+                	log_and_traverse(known_folders.alter_database, version_id, new_version, ConnectionType.Admin);
                     database_migrator.close_admin_connection();
 
                     if (database_was_created)
@@ -176,7 +180,10 @@ namespace roundhouse.runners
                 else
                 {
                     database_migrator.open_admin_connection();
-                    BackupDatabase();
+                	if (configuration.BackupDatabase)
+                	{
+                		BackupDatabase();
+                	}
                     database_migrator.delete_database();
                     database_migrator.close_admin_connection();
                     database_migrator.close_connection();
@@ -213,7 +220,11 @@ namespace roundhouse.runners
                                                             database_migrator.database.server_name
                 );
 
-            database_migrator.backup_database_if_it_exists();
+        	if (!_backupComplete)
+        	{
+        		database_migrator.backup_database_if_it_exists();
+        		_backupComplete = true;
+        	}
         }
 
         public void log_and_traverse(MigrationsFolder folder, long version_id, string new_version, ConnectionType connection_type)

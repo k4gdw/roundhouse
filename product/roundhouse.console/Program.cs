@@ -79,7 +79,7 @@
         {
             bool help = false;
 
-            OptionSet option_set = new OptionSet()
+            OptionSet optionSet = new OptionSet()
                 .Add("?|help|h",
                      "Prints out the options.",
                      option => help = option != null)
@@ -292,21 +292,24 @@
                 .Add("searchallinsteadoftraverse=|searchallsubdirectoriesinsteadoftraverse=",
                      "SearchAllSubdirectoriesInsteadOfTraverse - Each Migration folder's subdirectories are traversed by default. This option pulls back scripts from the main directory and all subdirectories at once. Defaults to 'false'",
                      option => configuration.SearchAllSubdirectoriesInsteadOfTraverse = option != null)
-                ;
+                //backup
+				.Add("backupdb=|backup=|backupdatabase=","This instructs RH to backup the database.",
+					option => configuration.BackupDatabase = Convert.ToBoolean(option))
+				;
 
             try
             {
-                option_set.Parse(args);
+                optionSet.Parse(args);
             }
             catch (OptionException)
             {
-                show_help("Error, usage is:", option_set);
+                show_help("Error, usage is:", optionSet);
             }
 
             if (help)
             {
                 the_logger.Info("Usage of RoundhousE (RH)");
-                string usage_message =
+                string usageMessage =
                     string.Format(
                         "rh.exe /d[atabase] VALUE OR rh.exe /c[onnection]s[tring] VALUE followed by all the optional parameters {0}" +
                         "[" +
@@ -337,21 +340,22 @@
                         "/disabletokenreplacement " +
                         "/baseline " +
                         "/dryrun " +
-                        "/search[allsubdirectories]insteadoftraverse" +
+                        "/search[allsubdirectories]insteadoftraverse " +
+						"/backupdb|backup|backupdatabase" +
                         "]", Environment.NewLine);
-                show_help(usage_message, option_set);
+                show_help(usageMessage, optionSet);
             }
 
             if (string.IsNullOrEmpty(configuration.DatabaseName) && string.IsNullOrEmpty(configuration.ConnectionString))
             {
-                show_help("Error: You must specify Database Name (/d) OR Connection String (/cs) at a minimum to use RoundhousE.", option_set);
+                show_help("Error: You must specify Database Name (/d) OR Connection String (/cs) at a minimum to use RoundhousE.", optionSet);
             }
 
             if (configuration.Restore && string.IsNullOrEmpty(configuration.RestoreFromPath))
             {
                 show_help(
                     "If you set Restore to true, you must specify a location for the database to be restored from (RestoreFromPath /restorefrompath).",
-                    option_set);
+                    optionSet);
             }
         }
 
