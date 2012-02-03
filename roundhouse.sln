@@ -43,6 +43,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{828B1E
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionInfo", "SolutionInfo", "{BCB3F2BB-64D8-4C42-B242-F219FBE39E89}"
+	ProjectSection(SolutionItems) = preProject
+		SolutionVersion.cs = SolutionVersion.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Build|Any CPU = Build|Any CPU
@@ -143,5 +148,11 @@ Global
 		{1D41D70E-E310-4699-B7CB-C1F77476A685} = {BCFAF88B-B6C0-48C1-B23E-FCC95B75588C}
 		{41CE538E-E6F1-4AB6-AB66-508DEF669A39} = {BCFAF88B-B6C0-48C1-B23E-FCC95B75588C}
 		{50FE3924-D7FD-4AC2-A103-AED685A183CA} = {DF4D94CB-902F-4DCE-B4FD-81542EEB33F1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		BuildVersion_BuildVersioningStyle = None.None.None.Increment
+		BuildVersion_AssemblyInfoFilename = SolutionVersion.cs
+		BuildVersion_UpdateFileVersion = True
+		BuildVersion_UpdateAssemblyVersion = True
 	EndGlobalSection
 EndGlobal
