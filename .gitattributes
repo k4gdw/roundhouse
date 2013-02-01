@@ -1,0 +1,17 @@
+*			text=auto
+
+*.sln    	text eol=crlf
+*.markdown	text
+*.md		text
+
+# binary files
+*.png	binary
+*.jpg	binary
+*.gif	binary
+*.zip	binary
+*.nupkg	binary
+*.dll	binsry
+*.exe	binary
+*.ico	binary
+
+core.autocrlf=true
