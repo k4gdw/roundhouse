@@ -1,5 +1,3 @@
-*			text=auto
-
 *.sln    	text eol=crlf
 *.markdown	text
 *.md		text
@@ -14,4 +12,4 @@
 *.exe	binary
 *.ico	binary
 
-core.autocrlf=true
+core.autocrlf=false

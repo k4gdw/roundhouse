@@ -16,7 +16,14 @@ namespace roundhouse.databases.sqlserver
 
         public override string sql_statement_separator_regex_pattern
         {
-            get { return @"(?<KEEP1>^(?:[\s\t])*(?:-{2}).*$)|(?<KEEP1>/{1}\*{1}[\S\s]*?\*{1}/{1})|(?<KEEP1>'{1}(?:[^']|\n[^'])*?'{1})|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>\s)|(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>$)"; }
+            get
+            {
+                const string strings = @"(?<KEEP1>'[^']*')";
+                const string dashComments = @"(?<KEEP1>--.*$)";
+                const string starComments = @"(?<KEEP1>/\*[\S\s]*?\*/)";
+                const string separator = @"(?<KEEP1>\s)(?<BATCHSPLITTER>GO)(?<KEEP2>\s|$)";
+                return strings + "|" + dashComments + "|" + starComments + "|" + separator;
+            }
         }
 
         public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
@@ -28,12 +35,12 @@ namespace roundhouse.databases.sqlserver
                 {
                     if (string.IsNullOrEmpty(server_name) && (part.to_lower().Contains("server") || part.to_lower().Contains("data source")))
                     {
-                        server_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
+                        server_name = part.Substring(part.IndexOf("=") + 1);
                     }
 
                     if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("initial catalog") || part.to_lower().Contains("database")))
                     {
-                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
+                        database_name = part.Substring(part.IndexOf("=") + 1);
                     }
                 }
 
@@ -83,7 +90,7 @@ namespace roundhouse.databases.sqlserver
 
         protected override void connection_specific_setup(IDbConnection connection)
         {
-            ((SqlConnection)connection).InfoMessage += (sender, e) => Log.bound_to(this).log_an_info_event_containing("  [SQL PRINT]: {0}{1}", Environment.NewLine, e.Message);
+            ((SqlConnection)connection).InfoMessage += (sender, e) => Log.bound_to(this).log_a_debug_event_containing("  [SQL PRINT]: {0}{1}", Environment.NewLine, e.Message);
         }
 
         public override void run_database_specific_tasks()
@@ -95,12 +102,22 @@ namespace roundhouse.databases.sqlserver
             //TODO: Delete RoundhousE user if it exists (i.e. migration from SQL2000 to 2005)
         }
 
-        private void create_roundhouse_schema_if_it_doesnt_exist()
+        public void create_roundhouse_schema_if_it_doesnt_exist()
         {
-            run_sql(create_roundhouse_schema_script(),ConnectionType.Default);
+            try
+            {
+                run_sql(create_roundhouse_schema_script(),ConnectionType.Default);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //Log.bound_to(this).log_a_warning_event_containing(
+                //    "Either the schema has already been created OR {0} with provider {1} does not provide a facility for creating roundhouse schema at this time.{2}{3}",
+                //    GetType(), provider, Environment.NewLine, ex.Message);
+            }
         }
 
-        private string create_roundhouse_schema_script()
+        public string create_roundhouse_schema_script()
         {
             return string.Format(
                 @"
@@ -156,7 +173,7 @@ namespace roundhouse.databases.sqlserver
 
         public override string restore_database_script(string restore_from_path, string custom_restore_options)
         {
-            string restore_options;
+            string restore_options = string.Empty;
             if (!string.IsNullOrEmpty(custom_restore_options))
             {
                 restore_options = custom_restore_options.to_lower().StartsWith(",") ? custom_restore_options : ", " + custom_restore_options;
@@ -187,7 +204,7 @@ namespace roundhouse.databases.sqlserver
 
         public string get_default_restore_move_options()
         {
-            var restore_options = new StringBuilder();
+            StringBuilder restore_options = new StringBuilder();
             DataTable dt = execute_datatable("select [name],[physical_name] from sys.database_files");
             if (dt != null && dt.Rows.Count != 0)
             {
@@ -222,13 +239,13 @@ namespace roundhouse.databases.sqlserver
         /// </summary>
         private DataTable execute_datatable(string sql_to_run)
         {
-            var result = new DataSet();
+            DataSet result = new DataSet();
 
             using (IDbCommand command = setup_database_command(sql_to_run,ConnectionType.Default,null))
             {
                 using (IDataReader data_reader = command.ExecuteReader())
                 {
-                    var data_table = new DataTable();
+                    DataTable data_table = new DataTable();
                     data_table.Load(data_reader);
                     data_reader.Close();
                     data_reader.Dispose();

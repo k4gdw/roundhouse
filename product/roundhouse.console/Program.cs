@@ -75,11 +75,6 @@ namespace roundhouse.console
             ApplicationConfiguraton.set_defaults_if_properties_are_not_set(configuration);
             ApplicationConfiguraton.build_the_container(configuration);
 
-            if (configuration.Debug)
-            {
-                change_log_to_debug_level();
-            }
-
             return configuration;
         }
 
@@ -87,7 +82,7 @@ namespace roundhouse.console
         {
             bool help = false;
 
-            OptionSet optionSet = new OptionSet()
+            OptionSet option_set = new OptionSet()
                 .Add("?|help|h",
                      "Prints out the options.",
                      option => help = option != null)
@@ -312,17 +307,17 @@ namespace roundhouse.console
 
             try
             {
-                optionSet.Parse(args);
+                option_set.Parse(args);
             }
             catch (OptionException)
             {
-                show_help("Error, usage is:", optionSet);
+                show_help("Error, usage is:", option_set);
             }
 
             if (help)
             {
                 the_logger.Info("Usage of RoundhousE (RH)");
-                string usageMessage =
+                string usage_message =
                     string.Format(
                         "rh.exe /d[atabase] VALUE OR rh.exe /c[onnection]s[tring] VALUE followed by all the optional parameters {0}" +
                         "[" +
@@ -354,22 +349,21 @@ namespace roundhouse.console
                         "/disabletokenreplacement " +
                         "/baseline " +
                         "/dryrun " +
-                        "/search[allsubdirectories]insteadoftraverse " +
-						"/backupdb|backup|backupdatabase" +
+                        "/search[allsubdirectories]insteadoftraverse" +
                         "]", Environment.NewLine);
-                show_help(usageMessage, optionSet);
+                show_help(usage_message, option_set);
             }
 
             if (string.IsNullOrEmpty(configuration.DatabaseName) && string.IsNullOrEmpty(configuration.ConnectionString))
             {
-                show_help("Error: You must specify Database Name (/d) OR Connection String (/cs) at a minimum to use RoundhousE.", optionSet);
+                show_help("Error: You must specify Database Name (/d) OR Connection String (/cs) at a minimum to use RoundhousE.", option_set);
             }
 
             if (configuration.Restore && string.IsNullOrEmpty(configuration.RestoreFromPath))
             {
                 show_help(
                     "If you set Restore to true, you must specify a location for the database to be restored from (RestoreFromPath /restorefrompath).",
-                    optionSet);
+                    option_set);
             }
         }
 
@@ -379,20 +373,6 @@ namespace roundhouse.console
             the_logger.Info(message);
             option_set.WriteOptionDescriptions(Console.Error);
             Environment.Exit(-1);
-        }
-
-        public static void change_log_to_debug_level()
-        {
-            ILoggerRepository log_repository = LogManager.GetRepository(Assembly.GetCallingAssembly());
-            log_repository.Threshold = Level.Debug;
-            foreach (ILogger log in log_repository.GetCurrentLoggers())
-            {
-                var logger = log as Logger;
-                if (logger != null)
-                {
-                    logger.Level = Level.Debug;
-                }
-            }
         }
 
         public static void run_migrator(ConfigurationPropertyHolder configuration)

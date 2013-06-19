@@ -43,7 +43,7 @@ namespace roundhouse.databases.oracle
                 {
                     if (string.IsNullOrEmpty(server_name) && part.to_lower().Contains("data source"))
                     {
-                        database_name = part.Substring(part.IndexOf("=", StringComparison.Ordinal) + 1);
+                        database_name = part.Substring(part.IndexOf("=") + 1);
                     }
 
                     //if (string.IsNullOrEmpty(database_name) && (part.to_lower().Contains("user id")))
@@ -111,7 +111,7 @@ namespace roundhouse.databases.oracle
             run_sql(create_sequence_script(scripts_run_errors_table_name), ConnectionType.Default);
         }
 
-        private string create_sequence_script(string table_name)
+        public string create_sequence_script(string table_name)
         {
             return string.Format(
                 @"
@@ -162,7 +162,7 @@ namespace roundhouse.databases.oracle
             Log.bound_to(this).log_a_debug_event_containing("Replacing \r\n with \n to be compliant with Oracle.");
             //http://www.barrydobson.com/2009/02/17/pls-00103-encountered-the-symbol-when-expecting-one-of-the-following/
             sql_to_run = sql_to_run.Replace("\r\n", "\n");
-            var return_value = new object();
+            object return_value = new object();
 
             if (string.IsNullOrEmpty(sql_to_run)) return return_value;
 
@@ -196,7 +196,7 @@ namespace roundhouse.databases.oracle
             return new AdoNetParameter(parameter);
         }
 
-        private string insert_version_script()
+        public string insert_version_script()
         {
             return string.Format(
                 @"
@@ -218,7 +218,7 @@ namespace roundhouse.databases.oracle
                 roundhouse_schema_name, version_table_name);
         }
 
-        private string get_version_id_script()
+        public string get_version_id_script()
         {
             return string.Format(
                 @"

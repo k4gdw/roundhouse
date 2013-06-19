@@ -268,8 +268,6 @@ namespace roundhouse.migrators
 
         private bool this_script_has_changed_since_last_run(string script_name, string sql_to_run)
         {
-            bool hash_is_same = false;
-
             string old_text_hash = string.Empty;
             try
             {
@@ -284,12 +282,42 @@ namespace roundhouse.migrators
 
             string new_text_hash = create_hash(sql_to_run);
 
-            if (String.Compare(old_text_hash, new_text_hash, StringComparison.OrdinalIgnoreCase) == 0)
+            bool hash_is_same = hashes_are_equal(new_text_hash, old_text_hash);
+
+            if (!hash_is_same)
             {
-                hash_is_same = true;
+                // extra checks if only line endings have changed
+                hash_is_same = have_same_hash_ignoring_platform(sql_to_run, old_text_hash);
+                if (hash_is_same)
+                {
+                    Log.bound_to(this).log_a_warning_event_containing("Script {0} had different line endings than before but equal content", script_name);
+                }
             }
 
             return !hash_is_same;
+        }
+
+        private bool hashes_are_equal(string new_text_hash, string old_text_hash)
+        {
+            return string.Compare(old_text_hash, new_text_hash, true) == 0;
+        }
+
+        private bool have_same_hash_ignoring_platform(string sql_to_run, string old_text_hash)
+        {
+            // check with unix and windows line endings
+            const string line_ending_windows = "\r\n";
+            const string line_ending_unix = "\n";
+            string new_text_hash = create_hash(sql_to_run.Replace(line_ending_windows, line_ending_unix));
+            bool hash_is_same = hashes_are_equal(new_text_hash, old_text_hash);
+
+            if (!hash_is_same)
+            {
+                // try other way around
+                new_text_hash = create_hash(sql_to_run.Replace(line_ending_unix, line_ending_windows));
+                hash_is_same = hashes_are_equal(new_text_hash, old_text_hash);
+            }
+
+            return hash_is_same;
         }
 
         private bool this_script_should_run(string script_name, string sql_to_run, bool run_this_script_once, bool run_this_script_every_time)
@@ -304,7 +332,13 @@ namespace roundhouse.migrators
                 return true;
             }
 
-            return !this_script_has_run_already(script_name) || this_script_has_changed_since_last_run(script_name, sql_to_run);
+            if (this_script_has_run_already(script_name)
+                && !this_script_has_changed_since_last_run(script_name, sql_to_run))
+            {
+                return false;
+            }
+            
+            return true;
         }
 
         public bool this_is_an_environment_file_and_its_in_the_right_environment(string script_name, Environment environment)
