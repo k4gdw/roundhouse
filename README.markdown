@@ -62,6 +62,7 @@ Donations Accepted - If you enjoy using this product or it has saved you time an
 It helps keep to the product updated, pays for site hosting, etc. https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9831498
 
 # RELEASE NOTES
+<<<<<<< HEAD
 ## 0.8.6
 
 ### Enhancements
@@ -96,6 +97,8 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
 
   + RoundhousE will change the DB recover mode if the `recoverymode` mode option is explicitly set to `simple` or `full`. In the past, RoundhousE would default to `full` but would only ever set the recovery mode while creating/restoring the database. If you depended on RoundhousE to create/restore the database for you and you don't want the database server default to be used, you should specify the recovery mode option.
 
+=======
+>>>>>>> Not sure what changed.
 ## 0.8.5  
 * FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
 * **SQLite Support!**. See details https://github.com/chucknorris/roundhouse/issues/21 (r360)  
@@ -162,4 +165,8 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
 
   
 # CREDITS
+<<<<<<< HEAD
 UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
+=======
+UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
+>>>>>>> Not sure what changed.
