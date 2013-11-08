@@ -63,7 +63,10 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
 
 # RELEASE NOTES
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> master
 <<<<<<< HEAD
 ## 0.8.6
 
@@ -101,6 +104,11 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
 
 =======
 >>>>>>> Not sure what changed.
+<<<<<<< HEAD
+>>>>>>> master
+=======
+=======
+>>>>>>> 3c64e830218bb50924563a3e783f1f192c3057c4
 >>>>>>> master
 ## 0.8.5  
 * FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
@@ -169,11 +177,20 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
   
 # CREDITS
 <<<<<<< HEAD
+<<<<<<< HEAD
 UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
 =======
+=======
+>>>>>>> master
 <<<<<<< HEAD
 UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
 =======
 UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
 >>>>>>> Not sure what changed.
+<<<<<<< HEAD
+>>>>>>> master
+=======
+=======
+UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
+>>>>>>> 3c64e830218bb50924563a3e783f1f192c3057c4
 >>>>>>> master
