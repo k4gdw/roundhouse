@@ -30,6 +30,9 @@ SolutionVersion.vb
 .DS_Store
 Thumbs.db
 
+# GhostDoc
+*.GhostDoc.xml
+
 # Project Specific
 !gems/bin
 
