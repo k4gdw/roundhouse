@@ -6,7 +6,7 @@ Project RoundhousE - Database Change Management done right
 Apache 2.0 - see docs\legal (just LEGAL in the zip folder)  
   
 # Documentation
-[WIKI](https://github.com/chucknorris/roundhouse/wiki)  
+[WIKI][1]
   
 # IMPORTANT
 NOTE: If you are looking at the source - please run build.bat before opening the solution. It creates the SolutionVersion.cs file that is necessary for a successful build.
@@ -32,20 +32,24 @@ If you have Ruby 1.8.6+ (and Gems 1.3.7+) installed, you can get the current rel
 ### NuGet  
 With NuGet you can get the current release of RoundhousE to your application quickly!  
   
-1. In Visual Studio Package Manager Console type `install-package roundhouse`  
+1. In Visual Studio Package Manager Console type `install-package k4gdw.roundhouse`, or,
+   `install-package roundhouse` to get the latest stable version of the original.
 2. There is also `roundhouse.lib`, `roundhouse.msbuild`, and `roundhouse.refreshdatabase`  
   
 ### Chocolatey  
 Chocolatey like apt-get, but for Windows! This is an alternative method to get the current release of RoundhousE to your machine quickly!  
   
-1. Type `cinst roundhouse`  
+1. Type `cinst roundhouse` note: I haven't created a chocolatey installer for my version that contains
+   the Sql Server backup functionality, so this is the original version upon which K4GDW.RoundhousE was built.
 2. Then from anywhere you can type `rh [options]`  
   
 ### Source
 This is the best way to get to the bleeding edge of what we are doing.  
 
 1. Clone the source down to your machine.  
-  `git clone git://github.com/chucknorris/roundhouse.git`  
+  `git clone git://github.com/k4gdw/roundhouse.git` or, if you want the original upstream version,
+  `git clone git://github.com/chucknorris/roundhouse.git` which will likely be more up-to-date but
+  wont have my backup functionality for SqlServer.
 2. Type `cd roundhouse`  
 3. Type `git config core.autocrlf false` to leave line endings as they are.  
 4. Type `git status`. You should not see any files to change.
@@ -62,12 +66,6 @@ Donations Accepted - If you enjoy using this product or it has saved you time an
 It helps keep to the product updated, pays for site hosting, etc. https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9831498
 
 # RELEASE NOTES
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> master
-<<<<<<< HEAD
 ## 0.8.6
 
 ### Enhancements
@@ -99,19 +97,10 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
   + Fix: Improve logging of RH exceptions. (torkelo - [pull #60](https://github.com/chucknorris/roundhouse/pull/60))
 
 ### Breaking Changes
+ +  RoundhousE will change the DB recover mode if the `recoverymode` mode option is explicitly set to `simple` or `full`. In the past, RoundhousE would default to `full` but would only ever set the recovery mode while creating/restoring the database. If you depended on RoundhousE to create/restore the database for you and you don't want the database server default to be used, you should specify the recovery mode option.
 
-  + RoundhousE will change the DB recover mode if the `recoverymode` mode option is explicitly set to `simple` or `full`. In the past, RoundhousE would default to `full` but would only ever set the recovery mode while creating/restoring the database. If you depended on RoundhousE to create/restore the database for you and you don't want the database server default to be used, you should specify the recovery mode option.
-
-=======
->>>>>>> Not sure what changed.
-<<<<<<< HEAD
->>>>>>> master
-=======
-=======
->>>>>>> 3c64e830218bb50924563a3e783f1f192c3057c4
->>>>>>> master
 ## 0.8.5  
-* FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
+ * FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
 * **SQLite Support!**. See details https://github.com/chucknorris/roundhouse/issues/21 (r360)  
 * **PostgreSQL Support!** Thanks SiimV! See details https://github.com/chucknorris/roundhouse/issues/30 (r359)  
 * **New Configuration Switch!** SearchAllSubdirectoriesInsteadOfTraverse - All migrations subfolders are traversed by default and run in order of each folder's scripts. This option runs all items in subfolders at same time. Thanks SiimV! See details https://github.com/chucknorris/roundhouse/issues/31 (r359)  
@@ -176,21 +165,6 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
 
   
 # CREDITS
-<<<<<<< HEAD
-<<<<<<< HEAD
 UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
-=======
-=======
->>>>>>> master
-<<<<<<< HEAD
-UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
-=======
-UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
->>>>>>> Not sure what changed.
-<<<<<<< HEAD
->>>>>>> master
-=======
-=======
-UppercuT - Automated Builds (automated build in 10 minutes or less?!) [http://projectuppercut.org](http://projectuppercut.org)
->>>>>>> 3c64e830218bb50924563a3e783f1f192c3057c4
->>>>>>> master
+
+[1]: (https://github.com/chucknorris/roundhouse/wiki) "The RoundhousE WIKI"
