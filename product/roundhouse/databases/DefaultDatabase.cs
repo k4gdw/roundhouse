@@ -3,6 +3,7 @@ namespace roundhouse.databases
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
     using connections;
     using infrastructure.app;
     using infrastructure.app.tokens;
@@ -36,7 +37,7 @@ namespace roundhouse.databases
 
         public virtual string sql_statement_separator_regex_pattern
         {
-            get { return @"(?<KEEP1>^(?:[\s\t])*(?:-{2}).*$)|(?<KEEP1>/{1}\*{1}[\S\s]*?\*{1}/{1})|(?<KEEP1>'{1}(?:[^']|\n[^'])*?'{1})|(?<KEEP1>\s)(?<BATCHSPLITTER>\;)(?<KEEP2>\s)|(?<KEEP1>\s)(?<BATCHSPLITTER>\;)(?<KEEP2>$)"; }
+            get { return @"(?<KEEP1>^(?:[\s\t])*(?:-{2}).*$)|(?<KEEP1>/{1}\*{1}[\S\s]*?\*{1}/{1})|(?<KEEP1>'{1}(?:[^']|\n[^'])*?'{1})|(?<KEEP1>^|\s)(?<BATCHSPLITTER>\;)(?<KEEP2>\s|$)"; }
         }
 
         public int command_timeout { get; set; }
@@ -59,6 +60,7 @@ namespace roundhouse.databases
         protected IConnection<DBCONNECTION> admin_connection;
 
         private bool disposing;
+        private Dictionary<string, ScriptsRun> scripts_cache;
 
         //this method must set the provider
         public abstract void initialize_connections(ConfigurationPropertyHolder configuration_property_holder);
@@ -275,14 +277,14 @@ namespace roundhouse.databases
         {
             string version = "0";
 
-            DetachedCriteria crit = DetachedCriteria.For<Version>()
-                .Add(Restrictions.Eq("repository_path", repository_path ?? string.Empty))
-                .AddOrder(Order.Desc("entry_date"))
-                .SetMaxResults(1);
+            QueryOver<Version> crit = QueryOver.Of<Version>()
+                .Where(x => x.repository_path == (repository_path ?? string.Empty))
+                .OrderBy(x => x.entry_date).Desc
+                .Take(1);
 
             try
             {
-                IList<Version> items = repository.get_with_criteria<Version>(crit);
+                IList<Version> items = repository.get_with_criteria(crit);
                 if (items != null && items.Count > 0)
                 {
                     version = items[0].version;
@@ -325,16 +327,23 @@ namespace roundhouse.databases
 
         public string get_current_script_hash(string script_name)
         {
-            string hash = string.Empty;
+            ScriptsRun script = get_from_script_cache(script_name);
 
-            DetachedCriteria crit = DetachedCriteria.For<ScriptsRun>()
-                .Add(Restrictions.Eq("script_name", script_name))
-                .AddOrder(Order.Desc("id"))
-                .SetMaxResults(1);
+            if (script != null)
+            {
+                return script.text_hash;
+            }
+
+            QueryOver<ScriptsRun> crit = QueryOver.Of<ScriptsRun>()
+                .Where(x => x.script_name == script_name)
+                .OrderBy(x => x.id).Desc
+                .Take(1);
+
+            string hash = string.Empty;
 
             try
             {
-                IList<ScriptsRun> items = repository.get_with_criteria<ScriptsRun>(crit);
+                IList<ScriptsRun> items = repository.get_with_criteria(crit);
                 if (items != null && items.Count > 0)
                 {
                     hash = items[0].text_hash;
@@ -353,16 +362,23 @@ namespace roundhouse.databases
 
         public bool has_run_script_already(string script_name)
         {
+            ScriptsRun script = get_from_script_cache(script_name);
+
+            if (script != null)
+            {
+                return true;
+            }
+
             bool script_has_run = false;
 
-            DetachedCriteria crit = DetachedCriteria.For<ScriptsRun>()
-                .Add(Restrictions.Eq("script_name", script_name))
-                .AddOrder(Order.Desc("id"))
-                .SetMaxResults(1);
+            QueryOver<ScriptsRun> crit = QueryOver.Of<ScriptsRun>()
+                .Where(x => x.script_name == script_name)
+                .OrderBy(x => x.id).Desc
+                .Take(1);
 
             try
             {
-                IList<ScriptsRun> items = repository.get_with_criteria<ScriptsRun>(crit);
+                IList<ScriptsRun> items = repository.get_with_criteria(crit);
                 if (items != null && items.Count > 0)
                 {
                     script_has_run = true;
@@ -379,7 +395,7 @@ namespace roundhouse.databases
             return script_has_run;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (!disposing)
             {
@@ -406,6 +422,35 @@ namespace roundhouse.databases
                 }
 
                 connection.Dispose();
+            }
+        }
+
+        private ScriptsRun get_from_script_cache(string script_name)
+        {
+            ensure_script_cache();
+
+            ScriptsRun script;
+            if (scripts_cache.TryGetValue(script_name, out script))
+            {
+                return script;
+            }
+
+            return null;
+        }
+
+        private void ensure_script_cache()
+        {
+            if (scripts_cache != null)
+            {
+                return;
+            }
+
+            scripts_cache = new Dictionary<string, ScriptsRun>();
+
+            // latest id overrides possible old one, just like in queries searching for scripts
+            foreach (var script in repository.get_all<ScriptsRun>().OrderBy(x => x.id))
+            {
+                scripts_cache[script.script_name] = script;
             }
         }
     }

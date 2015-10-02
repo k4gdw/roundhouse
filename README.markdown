@@ -13,7 +13,7 @@ NOTE: If you are looking at the source - please run build.bat before opening the
 
 # INFO
 ## Overview
-RoundhousE is an automated database deployment (change management) system that allows you to use your current idioms and gain much more. Currently it only supports Microsoft SQL Server, but there are future plans for other databases.  
+RoundhousE is an automated database deployment (change management) system that allows you to use your current idioms and gain much more. Currently works with Oracle, SQL Server (2000/2005/2008/Express), Access, MySQL, SQLite and PostgreSQL.There are future plans for other databases.  
   
 It seeks to solve both maintenance concerns and ease of deployment. We follow some of the same idioms as other database management systems (SQL scripts), but we are different in that we think about future maintenance concerns. We want to always apply certain scripts (anything stateless like functions, views, stored procedures, and permissions), so we don't have to throw everything into our change scripts. This seeks to solves future source control concerns. How sweet is it when you can version the database according to your current source control version?  
   
@@ -37,7 +37,7 @@ With NuGet you can get the current release of RoundhousE to your application qui
 2. There is also `roundhouse.lib`, `roundhouse.msbuild`, and `roundhouse.refreshdatabase`  
   
 ### Chocolatey  
-Chocolatey like apt-get, but for Windows! This is an alternative method to get the current release of RoundhousE to your machine quickly!  
+Chocolatey is like apt-get, but for Windows! This is an alternative method to get the current release of RoundhousE to your machine quickly!  
   
 1. Type `cinst roundhouse` note: I haven't created a chocolatey installer for my version that contains
    the Sql Server backup functionality, so this is the original version upon which K4GDW.RoundhousE was built.
@@ -97,10 +97,10 @@ It helps keep to the product updated, pays for site hosting, etc. https://www.pa
   + Fix: Improve logging of RH exceptions. (torkelo - [pull #60](https://github.com/chucknorris/roundhouse/pull/60))
 
 ### Breaking Changes
- +  RoundhousE will change the DB recover mode if the `recoverymode` mode option is explicitly set to `simple` or `full`. In the past, RoundhousE would default to `full` but would only ever set the recovery mode while creating/restoring the database. If you depended on RoundhousE to create/restore the database for you and you don't want the database server default to be used, you should specify the recovery mode option.
+ +  RoundhousE will change the DB recovery mode if the `recoverymode` mode option is explicitly set to `simple` or `full`. In the past, RoundhousE would default to `full` but would only ever set the recovery mode while creating/restoring the database. If you depended on RoundhousE to create/restore the database for you and you don't want the database server default to be used, you should specify the recovery mode option.
 
 ## 0.8.5  
- * FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
+* FIX: KeyNotFoundException in NHibernateSessionFactoryBuilder. See [issue 59] (http://code.google.com/p/roundhouse/issues/detail?id=59) for details. (r361)  
 * **SQLite Support!**. See details https://github.com/chucknorris/roundhouse/issues/21 (r360)  
 * **PostgreSQL Support!** Thanks SiimV! See details https://github.com/chucknorris/roundhouse/issues/30 (r359)  
 * **New Configuration Switch!** SearchAllSubdirectoriesInsteadOfTraverse - All migrations subfolders are traversed by default and run in order of each folder's scripts. This option runs all items in subfolders at same time. Thanks SiimV! See details https://github.com/chucknorris/roundhouse/issues/31 (r359)  
