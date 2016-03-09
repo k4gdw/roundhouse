@@ -86,7 +86,7 @@ namespace roundhouse.databases
         bool supports_ddl_transactions { get; }
 
         void initialize_connections(ConfigurationPropertyHolder configuration_property_holder);
-        void open_connection(bool with_transaction);
+        void open_connection(bool withTransaction);
         void close_connection();
         void open_admin_connection();
         void close_admin_connection();
@@ -99,8 +99,8 @@ namespace roundhouse.databases
         void delete_database_if_it_exists();
         void run_database_specific_tasks();
         void create_or_update_roundhouse_tables();
-        void run_sql(string sql_to_run,ConnectionType connection_type);
-        object run_sql_scalar(string sql_to_run, ConnectionType connection_type);
+        void run_sql(string sqlToRun,ConnectionType connectionType);
+        object run_sql_scalar(string sqlToRun, ConnectionType connectionType);
         void insert_script_run(string script_name, string sql_to_run, string sql_to_run_hash, bool run_this_script_once, long version_id);
         void insert_script_run_error(string script_name, string sql_to_run, string sql_erroneous_part, string error_message, string repository_version, string repository_path);
 
@@ -108,6 +108,6 @@ namespace roundhouse.databases
         long insert_version_and_get_version_id(string repository_path, string repository_version);
         bool has_run_script_already(string script_name);
         string get_current_script_hash(string script_name);
-        //object run_sql_scalar(string sql_to_run);
+        //object run_sql_scalar(string sqlToRun);
     }
 }

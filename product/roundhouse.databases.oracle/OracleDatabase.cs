@@ -150,23 +150,23 @@ namespace roundhouse.databases.oracle
             return Convert.ToInt64(run_sql_scalar(get_version_id_script(), ConnectionType.Default, select_parameters));
         }
 
-        public override void run_sql(string sql_to_run, ConnectionType connection_type)
+        public override void run_sql(string sqlToRun, ConnectionType connectionType)
         {
             Log.bound_to(this).log_a_debug_event_containing("Replacing script text \r\n with \n to be compliant with Oracle.");
             // http://www.barrydobson.com/2009/02/17/pls-00103-encountered-the-symbol-when-expecting-one-of-the-following/
-            base.run_sql(sql_to_run.Replace("\r\n", "\n"), connection_type);
+            base.run_sql(sqlToRun.Replace("\r\n", "\n"), connectionType);
         }
 
-        protected override object run_sql_scalar(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters)
+        protected override object run_sql_scalar(string sqlToRun, ConnectionType connectionType, IList<IParameter<IDbDataParameter>> parameters)
         {
             Log.bound_to(this).log_a_debug_event_containing("Replacing \r\n with \n to be compliant with Oracle.");
             //http://www.barrydobson.com/2009/02/17/pls-00103-encountered-the-symbol-when-expecting-one-of-the-following/
-            sql_to_run = sql_to_run.Replace("\r\n", "\n");
+            sqlToRun = sqlToRun.Replace("\r\n", "\n");
             object return_value = new object();
 
-            if (string.IsNullOrEmpty(sql_to_run)) return return_value;
+            if (string.IsNullOrEmpty(sqlToRun)) return return_value;
 
-            using (IDbCommand command = setup_database_command(sql_to_run, connection_type, parameters))
+            using (IDbCommand command = setup_database_command(sqlToRun, connectionType, parameters))
             {
                 return_value = command.ExecuteScalar();
                 command.Dispose();

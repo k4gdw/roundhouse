@@ -18,11 +18,11 @@ namespace roundhouse.tests.infrastructure.containers
         public abstract class concern_for_container : observations_for_a_static_sut
         {
             protected static LogFactory result;
-            protected static InversionContainer the_container;
+            protected static IInversionContainer the_container;
 
             context c = () =>
                             {
-                                the_container = an<InversionContainer>();
+                                the_container = an<IInversionContainer>();
                                 Container.initialize_with(the_container);
                             };
 

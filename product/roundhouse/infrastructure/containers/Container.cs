@@ -4,9 +4,9 @@ namespace roundhouse.infrastructure.containers
 
     public static class Container
     {
-        private static InversionContainer the_container;
+        private static IInversionContainer the_container;
 
-        public static void initialize_with(InversionContainer container)
+        public static void initialize_with(IInversionContainer container)
         {
             the_container = container;
         }

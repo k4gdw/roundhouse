@@ -115,16 +115,16 @@ namespace roundhouse.databases.mysql
         }
 
         // http://bugs.mysql.com/bug.php?id=46429
-        public override void run_sql(string sql_to_run, ConnectionType connection_type)
+        public override void run_sql(string sqlToRun, ConnectionType connectionType)
         {
-            if (string.IsNullOrEmpty(sql_to_run)) return;
+            if (string.IsNullOrEmpty(sqlToRun)) return;
 
             //TODO Investigate how pass CommandTimeout into commands which will be during MySqlScript execution.
-            var connection = connection_type == ConnectionType.Admin
+            var connection = connectionType == ConnectionType.Admin
                 ? admin_connection.underlying_type().downcast_to<MySqlConnection>()
                 : server_connection.underlying_type().downcast_to<MySqlConnection>();
             
-            var script = new MySqlScript(connection, sql_to_run);
+            var script = new MySqlScript(connection, sqlToRun);
             script.Execute();
         }
 

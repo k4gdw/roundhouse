@@ -1,6 +1,6 @@
 namespace roundhouse.infrastructure.containers
 {
-    public interface InversionContainer
+    public interface IInversionContainer
     {
         TypeToReturn Resolve<TypeToReturn>();
     }

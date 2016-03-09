@@ -17,13 +17,13 @@ namespace roundhouse.tests.infrastructure.logging
         {
             protected static Logger result;
 
-            protected static InversionContainer the_container;
+            protected static IInversionContainer the_container;
             protected static LogFactory mock_log_factory;
             protected static Logger mock_logger;
 
             private context c = () =>
                                     {
-                                        the_container = an<InversionContainer>();
+                                        the_container = an<IInversionContainer>();
                                         Container.initialize_with(the_container);
                                     };
 

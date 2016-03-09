@@ -85,16 +85,16 @@ namespace roundhouse.databases.access
             admin_connection.open();
         }
 
-        public override void open_connection(bool with_transaction)
+        public override void open_connection(bool withTransaction)
         {
             server_connection = new AdoNetConnection(new OleDbConnection(connection_string));
             server_connection.open();
 
             set_repository();
 
-            if (with_transaction)
+            if (withTransaction)
             {
-                transaction = server_connection.underlying_type().BeginTransaction();
+                Transaction = server_connection.underlying_type().BeginTransaction();
                 repository.start(true);
             }
         }

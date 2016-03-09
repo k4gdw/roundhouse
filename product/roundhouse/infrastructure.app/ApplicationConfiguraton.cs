@@ -164,7 +164,7 @@ namespace roundhouse.infrastructure.app
             set_logging_level_debug_when_debug(configuration_property_holder);
         }
 
-        private static InversionContainer build_items_for_container(ConfigurationPropertyHolder configuration_property_holder)
+        private static IInversionContainer build_items_for_container(ConfigurationPropertyHolder configuration_property_holder)
         {
             configuration_property_holder.DatabaseType = DatabaseTypeSynonyms.convert_database_type_synonyms(configuration_property_holder.DatabaseType);
 

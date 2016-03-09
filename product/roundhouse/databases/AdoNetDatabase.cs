@@ -1,97 +1,91 @@
-﻿using System;
+﻿// AdoNetDatabase.cs
+// ***********************************************************************
+// Assembly: roundhouse
+// Author  : Bryan Johns
+// Created : 03-08-2016
+// ***********************************************************************
+// Last Modified By: Bryan Johns
+// Last Modified On 03-09-2016
+// ***********************************************************************
+// <copyright file="AdoNetDatabase.cs" 
+//            company="Alabama Department of Mental Health">
+//      Copyright © 2016, ADMH. All rights reserved.
+// </copyright>
+// <summary></summary>
+// *************************************************************************
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using roundhouse.connections;
 using roundhouse.infrastructure.app;
 using roundhouse.infrastructure.logging;
+using roundhouse.parameters;
 
-namespace roundhouse.databases
-{
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Data.Common;
-    using System.Data.SqlClient;
-    using connections;
-    using parameters;
+namespace roundhouse.databases{
+    public abstract class AdoNetDatabase : DefaultDatabase<IDbConnection>{
+        private const int SqlConnectionExceptionNumber = 233;
 
-    public abstract class AdoNetDatabase : DefaultDatabase<IDbConnection>
-    {
-        private const int sql_connection_exception_number = 233;
-        private bool split_batches_in_ado = true;
+        public override bool split_batch_statements { get; set; } = true;
 
-        public override bool split_batch_statements
-        {
-            get { return split_batches_in_ado; }
-            set { split_batches_in_ado = value; }
-        }
+        protected IDbTransaction Transaction;
 
-        protected IDbTransaction transaction;
+        private DbProviderFactory _providerFactory;
 
-        private DbProviderFactory provider_factory;
-
-        private AdoNetConnection GetAdoNetConnection(string conn_string)
-        {
-            provider_factory = DbProviderFactories.GetFactory(provider);
-            IDbConnection connection = provider_factory.CreateConnection();
+        private AdoNetConnection GetAdoNetConnection(string connString){
+            _providerFactory = DbProviderFactories.GetFactory(provider);
+            IDbConnection connection = _providerFactory.CreateConnection();
             connection_specific_setup(connection);
-            
-            connection.ConnectionString = conn_string;
+
+            if (connection == null) return null;
+            connection.ConnectionString = connString;
             return new AdoNetConnection(connection);
         }
 
-        protected virtual void connection_specific_setup(IDbConnection connection)
-        {
-        }
+        protected virtual void connection_specific_setup(IDbConnection connection) {}
 
-        public override void open_admin_connection()
-        {
-            Log.bound_to(this).log_a_debug_event_containing("Opening admin connection to '{0}'", admin_connection_string);
+        public override void open_admin_connection(){
+            Log.bound_to(this)
+                .log_a_debug_event_containing("Opening admin connection to '{0}'", admin_connection_string);
             admin_connection = GetAdoNetConnection(admin_connection_string);
             admin_connection.open();
         }
 
-        public override void close_admin_connection()
-        {
+        public override void close_admin_connection(){
             Log.bound_to(this).log_a_debug_event_containing("Closing admin connection");
-            if (admin_connection != null)
-            {
+            if (admin_connection != null){
                 admin_connection.clear_pool();
                 admin_connection.close();
                 admin_connection.Dispose();
                 admin_connection = null;
             }
-
         }
 
-        public override void open_connection(bool with_transaction)
-        {
+        public override void open_connection(bool withTransaction){
             Log.bound_to(this).log_a_debug_event_containing("Opening connection to '{0}'", connection_string);
             server_connection = GetAdoNetConnection(connection_string);
             server_connection.open();
-            if (with_transaction)
-            {
-                transaction = server_connection.underlying_type().BeginTransaction();
+            if (withTransaction){
+                Transaction = server_connection.underlying_type().BeginTransaction();
             }
-            
+
             set_repository();
-            if (repository != null)
-            {
-                repository.start(with_transaction);
-            }
+            repository?.start(withTransaction);
         }
 
-        public override void close_connection()
-        {
+        public override void close_connection(){
             Log.bound_to(this).log_a_debug_event_containing("Closing connection");
-            if (transaction != null)
-            {
-                transaction.Commit();
-                transaction = null;
+            if (Transaction != null){
+                Transaction.Commit();
+                Transaction = null;
             }
-            if (repository != null)
-            {
+            if (repository != null){
                 repository.finish();
             }
 
-            if (server_connection != null)
-            {
+            if (server_connection != null){
                 server_connection.clear_pool();
                 server_connection.close();
                 server_connection.Dispose();
@@ -99,97 +93,85 @@ namespace roundhouse.databases
             }
         }
 
-        public override void rollback()
-        {
+        public override void rollback(){
             Log.bound_to(this).log_a_debug_event_containing("Rolling back changes");
             repository.rollback();
 
-            if (transaction != null)
-            {
+            if (Transaction != null){
                 //rollback previous transaction
-                transaction.Rollback();
+                Transaction.Rollback();
                 server_connection.close();
 
                 //open a new transaction
                 server_connection.open();
                 //use_database(database_name);
-                transaction = server_connection.underlying_type().BeginTransaction();
+                Transaction = server_connection.underlying_type().BeginTransaction();
                 repository.start(true);
             }
         }
 
-        protected override void run_sql(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters)
-        {
-            if (string.IsNullOrEmpty(sql_to_run)) return;
+        protected override void run_sql(string sqlToRun,
+            ConnectionType connectionType, IList<IParameter<IDbDataParameter>> parameters){
+            if (string.IsNullOrEmpty(sqlToRun)) return;
 
             //really naive retry logic. Consider Lokad retry policy
             //this is due to sql server holding onto a connection http://social.msdn.microsoft.com/Forums/en-US/adodotnetdataproviders/thread/99963999-a59b-4614-a1b9-869c6dff921e
-            try
-            {
-                run_command_with(sql_to_run, connection_type, parameters);
+            try{
+                run_command_with(sqlToRun, connectionType, parameters);
             }
-            catch (SqlException ex)
-            {
-              // If we are not running inside a transaction, then we can continue to the next command.
-              if (transaction == null)
-              {
-                // But only if it's a connection failure AND connection failure is the only error reported.
-                if (ex.Errors.Count == 1 && ex.Number == sql_connection_exception_number)
-                {
-                  Log.bound_to(this).log_a_debug_event_containing("Failure executing command, trying again. {0}{1}", Environment.NewLine, ex.ToString());
-                  run_command_with(sql_to_run, connection_type, parameters);
+            catch (SqlException ex){
+                // If we are not running inside a transaction, then we can continue to the next command.
+                if (Transaction == null){
+                    // But only if it's a connection failure AND connection failure is the only error reported.
+                    if (ex.Errors.Count == 1 && ex.Number == SqlConnectionExceptionNumber){
+                        Log.bound_to(this)
+                            .log_a_debug_event_containing("Failure executing command, trying again. {0}{1}",
+                                Environment.NewLine, ex.ToString());
+                        run_command_with(sqlToRun, connectionType, parameters);
+                    }
+                    else{
+                        //Re-throw the original exception.
+                        throw;
+                    }
                 }
-                else
-                {
-                  //Re-throw the original exception.
-                  throw;
+                else{
+                    // Re-throw the exception, which will delegate handling of the rollback to DatabaseMigrator calling class,
+                    // e.g. DefaultDatabaseMigrator.run_sql(...) method catches exceptions from run_sql and rolls back the transaction.
+                    throw;
                 }
-              }
-              else
-              {
-                // Re-throw the exception, which will delegate handling of the rollback to DatabaseMigrator calling class,
-                // e.g. DefaultDatabaseMigrator.run_sql(...) method catches exceptions from run_sql and rolls back the transaction.
-                throw;
-              }
-            }
-            catch (Exception ex)
-            {
-              // If the Exception is not due to a SqlException, which is the case for any non-SqlServer database, then also delegate handling of the rollback to DatabaseMigrator calling class.
-              throw;
             }
         }
 
-        private void run_command_with(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters)
-        {
-            using (IDbCommand command = setup_database_command(sql_to_run, connection_type, parameters))
-            {
+        private void run_command_with(string sqlToRun,
+            ConnectionType connectionType,
+            IList<IParameter<IDbDataParameter>> parameters){
+            using (var command = setup_database_command(sqlToRun, connectionType, parameters)){
                 command.ExecuteNonQuery();
                 command.Dispose();
             }
         }
 
-        protected override object run_sql_scalar(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters)
-        {
-            object return_value = new object();
-            if (string.IsNullOrEmpty(sql_to_run)) return return_value;
+        protected override object run_sql_scalar(string sqlToRun,
+            ConnectionType connectionType,
+            IList<IParameter<IDbDataParameter>> parameters){
+            var returnValue = new object();
+            if (string.IsNullOrEmpty(sqlToRun)) return returnValue;
 
-            using (IDbCommand command = setup_database_command(sql_to_run, connection_type, null))
-            {
-                return_value = command.ExecuteScalar();
+            using (var command = setup_database_command(sqlToRun, connectionType, null)){
+                returnValue = command.ExecuteScalar();
                 command.Dispose();
             }
 
-            return return_value;
+            return returnValue;
         }
 
-        protected IDbCommand setup_database_command(string sql_to_run, ConnectionType connection_type, IEnumerable<IParameter<IDbDataParameter>> parameters)
-        {
+        protected IDbCommand setup_database_command(string sqlToRun,
+            ConnectionType connectionType,
+            IEnumerable<IParameter<IDbDataParameter>> parameters){
             IDbCommand command = null;
-            switch (connection_type)
-            {
+            switch (connectionType){
                 case ConnectionType.Default:
-                    if (server_connection == null || server_connection.underlying_type().State != ConnectionState.Open)
-                    {
+                    if (server_connection == null || server_connection.underlying_type().State != ConnectionState.Open){
                         open_connection(false);
                     }
                     Log.bound_to(this).log_a_debug_event_containing("Setting up command for normal connection");
@@ -197,8 +179,7 @@ namespace roundhouse.databases
                     command.CommandTimeout = command_timeout;
                     break;
                 case ConnectionType.Admin:
-                    if (admin_connection == null || admin_connection.underlying_type().State != ConnectionState.Open)
-                    {
+                    if (admin_connection == null || admin_connection.underlying_type().State != ConnectionState.Open){
                         open_admin_connection();
                     }
                     Log.bound_to(this).log_a_debug_event_containing("Setting up command for admin connection");
@@ -207,15 +188,13 @@ namespace roundhouse.databases
                     break;
             }
 
-            if (parameters != null)
-            {
-                foreach (IParameter<IDbDataParameter> parameter in parameters)
-                {
+            if (parameters != null){
+                foreach (var parameter in parameters){
                     command.Parameters.Add(parameter.underlying_type);
                 }
             }
-            command.Transaction = transaction;
-            command.CommandText = sql_to_run;
+            command.Transaction = Transaction;
+            command.CommandText = sqlToRun;
             command.CommandType = CommandType.Text;
 
             return command;

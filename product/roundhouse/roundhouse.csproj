@@ -162,7 +162,7 @@
     <Compile Include="infrastructure.app\ConfigurationPropertyHolder.cs" />
     <Compile Include="infrastructure\containers\Container.cs" />
     <Compile Include="infrastructure\containers\custom\StructureMapContainer.cs" />
-    <Compile Include="infrastructure\containers\InversionContainer.cs" />
+    <Compile Include="infrastructure\containers\IInversionContainer.cs" />
     <Compile Include="infrastructure.app\builders\DatabaseBuilder.cs" />
     <Compile Include="infrastructure\extensions\Iteration.cs" />
     <Compile Include="infrastructure\extensions\StringExtensions.cs">

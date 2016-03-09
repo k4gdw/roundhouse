@@ -127,11 +127,11 @@ namespace roundhouse.databases
             database.initialize_connections(configuration_property_holder);
         }
 
-        public void open_connection(bool with_transaction)
+        public void open_connection(bool withTransaction)
         {
             if (database_exists)
             {
-                database.open_connection(with_transaction);
+                database.open_connection(withTransaction);
             }
         }
 
@@ -203,27 +203,27 @@ namespace roundhouse.databases
             database.create_or_update_roundhouse_tables();
         }
 
-        public void run_sql(string sql_to_run,ConnectionType connection_type)
+        public void run_sql(string sqlToRun,ConnectionType connectionType)
         {
-            Log.bound_to(this).log_an_info_event_containing("Running statemtent: {0}{1}", Environment.NewLine, sql_to_run);
-            //database.run_sql(sql_to_run);
+            Log.bound_to(this).log_an_info_event_containing("Running statemtent: {0}{1}", Environment.NewLine, sqlToRun);
+            //database.run_sql(sqlToRun);
         }
         
-        public object run_sql_scalar(string sql_to_run,ConnectionType connection_type)
+        public object run_sql_scalar(string sqlToRun,ConnectionType connectionType)
         {
-            Log.bound_to(this).log_an_info_event_containing("Running statemtent: {0}{1}", Environment.NewLine, sql_to_run);
-            //database.run_sql(sql_to_run);
+            Log.bound_to(this).log_an_info_event_containing("Running statemtent: {0}{1}", Environment.NewLine, sqlToRun);
+            //database.run_sql(sqlToRun);
             return new object();
         }
 
         public void insert_script_run(string script_name, string sql_to_run, string sql_to_run_hash, bool run_this_script_once, long version_id)
         {
-            // database.insert_script_run(script_name, sql_to_run, sql_to_run_hash, run_this_script_once, version_id);
+            // database.insert_script_run(script_name, sqlToRun, sql_to_run_hash, run_this_script_once, version_id);
         }
 
         public void insert_script_run_error(string script_name, string sql_to_run, string sql_erroneous_part, string error_message, string repository_version, string repository_path)
         {
-            // database.insert_script_run_error(script_name, sql_to_run, sql_erroneous_part, error_message, repository_version, repository_path);
+            // database.insert_script_run_error(script_name, sqlToRun, sql_erroneous_part, error_message, repository_version, repository_path);
         }
 
         public string get_version(string repository_path)

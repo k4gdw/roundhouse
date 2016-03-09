@@ -133,9 +133,9 @@ namespace roundhouse.databases
         {
             database.close_admin_connection();
         }
-        public void open_connection(bool with_transaction)
+        public void open_connection(bool withTransaction)
         {
-            database.open_connection(with_transaction);
+            database.open_connection(withTransaction);
         }
 
         public void close_connection()
@@ -206,14 +206,14 @@ namespace roundhouse.databases
             database.create_or_update_roundhouse_tables();
         }
 
-        public void run_sql(string sql_to_run,ConnectionType connection_type)
+        public void run_sql(string sqlToRun,ConnectionType connectionType)
         {
-            database.run_sql(sql_to_run,connection_type);
+            database.run_sql(sqlToRun,connectionType);
         }    
         
-        public object run_sql_scalar(string sql_to_run,ConnectionType connection_type)
+        public object run_sql_scalar(string sqlToRun,ConnectionType connectionType)
         {
-            return database.run_sql_scalar(sql_to_run,connection_type);
+            return database.run_sql_scalar(sqlToRun,connectionType);
         }
 
         public void insert_script_run(string script_name, string sql_to_run, string sql_to_run_hash, bool run_this_script_once, long version_id)

@@ -75,7 +75,7 @@ namespace roundhouse.databases
             repository = new Repository(factory, cfg);
         }
 
-        public abstract void open_connection(bool with_transaction);
+        public abstract void open_connection(bool withTransaction);
         public abstract void close_connection();
         public abstract void open_admin_connection();
         public abstract void close_admin_connection();
@@ -209,20 +209,20 @@ namespace roundhouse.databases
             s.Execute(false, true);
         }
 
-        public virtual void run_sql(string sql_to_run, ConnectionType connection_type)
+        public virtual void run_sql(string sqlToRun, ConnectionType connectionType)
         {
-            Log.bound_to(this).log_a_debug_event_containing("[SQL] Running (on connection '{0}'): {1}{2}", connection_type.ToString(), Environment.NewLine, sql_to_run);
-            run_sql(sql_to_run, connection_type, null);
+            Log.bound_to(this).log_a_debug_event_containing("[SQL] Running (on connection '{0}'): {1}{2}", connectionType.ToString(), Environment.NewLine, sqlToRun);
+            run_sql(sqlToRun, connectionType, null);
         }
 
-        public virtual object run_sql_scalar(string sql_to_run, ConnectionType connection_type)
+        public virtual object run_sql_scalar(string sqlToRun, ConnectionType connectionType)
         {
-            Log.bound_to(this).log_a_debug_event_containing("[SQL] Running (on connection '{0}'): {1}{2}", connection_type.ToString(), Environment.NewLine, sql_to_run);
-            return run_sql_scalar(sql_to_run, connection_type, null);
+            Log.bound_to(this).log_a_debug_event_containing("[SQL] Running (on connection '{0}'): {1}{2}", connectionType.ToString(), Environment.NewLine, sqlToRun);
+            return run_sql_scalar(sqlToRun, connectionType, null);
         }
 
-        protected abstract void run_sql(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters);
-        protected abstract object run_sql_scalar(string sql_to_run, ConnectionType connection_type, IList<IParameter<IDbDataParameter>> parameters);
+        protected abstract void run_sql(string sqlToRun, ConnectionType connectionType, IList<IParameter<IDbDataParameter>> parameters);
+        protected abstract object run_sql_scalar(string sqlToRun, ConnectionType connectionType, IList<IParameter<IDbDataParameter>> parameters);
 
         public void insert_script_run(string script_name, string sql_to_run, string sql_to_run_hash, bool run_this_script_once, long version_id)
         {

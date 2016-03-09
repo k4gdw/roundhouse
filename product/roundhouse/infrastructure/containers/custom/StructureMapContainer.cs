@@ -1,19 +1,22 @@
+using System;
+
 namespace roundhouse.infrastructure.containers.custom
 {
     using StructureMap;
 
-    public sealed class StructureMapContainer : InversionContainer
+    public sealed class StructureMapContainer : IInversionContainer
     {
-        private readonly IContainer the_container;
+        private readonly IContainer _theContainer;
 
-        public StructureMapContainer(IContainer the_container)
+        public StructureMapContainer(IContainer theContainer)
         {
-            this.the_container = the_container;
+            if (theContainer == null) throw new ArgumentNullException(nameof(theContainer));
+            _theContainer = theContainer;
         }
 
         public TypeToReturn Resolve<TypeToReturn>()
         {
-            return the_container.GetInstance<TypeToReturn>();
+            return _theContainer.GetInstance<TypeToReturn>();
         }
     }
 }
