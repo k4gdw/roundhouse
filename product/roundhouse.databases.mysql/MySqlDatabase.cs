@@ -37,7 +37,7 @@ namespace roundhouse.databases.mysql
             return "";
         }
 
-        public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public override void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
             if (!string.IsNullOrEmpty(connection_string))
             {
@@ -63,15 +63,15 @@ namespace roundhouse.databases.mysql
 
             if (string.IsNullOrEmpty(connection_string))
             {
-                InteractivePrompt.write_header(configuration_property_holder);
-                var userName = InteractivePrompt.get_user("root", configuration_property_holder);
-                var password = InteractivePrompt.get_password("root", configuration_property_holder);
+                InteractivePrompt.write_header(configurationPropertyHolder);
+                var userName = InteractivePrompt.get_user("root", configurationPropertyHolder);
+                var password = InteractivePrompt.get_password("root", configurationPropertyHolder);
                 InteractivePrompt.write_footer();
                 
                 connection_string = build_connection_string(server_name, database_name, userName, password);
             }
 
-            configuration_property_holder.ConnectionString = connection_string;
+            configurationPropertyHolder.ConnectionString = connection_string;
 
             set_provider();
             if (string.IsNullOrEmpty(admin_connection_string))
@@ -80,8 +80,8 @@ namespace roundhouse.databases.mysql
                 builder.Database = "information_schema";
                 admin_connection_string = builder.ConnectionString;
             }
-            configuration_property_holder.DatabaseName = database_name;
-            configuration_property_holder.ConnectionStringAdmin = admin_connection_string;
+            configurationPropertyHolder.DatabaseName = database_name;
+            configurationPropertyHolder.ConnectionStringAdmin = admin_connection_string;
         }
 
         public override void set_provider()
@@ -121,8 +121,8 @@ namespace roundhouse.databases.mysql
 
             //TODO Investigate how pass CommandTimeout into commands which will be during MySqlScript execution.
             var connection = connectionType == ConnectionType.Admin
-                ? admin_connection.underlying_type().downcast_to<MySqlConnection>()
-                : server_connection.underlying_type().downcast_to<MySqlConnection>();
+                ? AdminConnection.underlying_type().downcast_to<MySqlConnection>()
+                : ServerConnection.underlying_type().downcast_to<MySqlConnection>();
             
             var script = new MySqlScript(connection, sqlToRun);
             script.Execute();

@@ -40,7 +40,7 @@
             return "";
         }
 
-        public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public override void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
             server_name = "sqlite";
             if (!string.IsNullOrEmpty(connection_string))
@@ -65,16 +65,16 @@
                 connection_string = build_connection_string(database_name);
             }
 
-            configuration_property_holder.ConnectionString = connection_string;
+            configurationPropertyHolder.ConnectionString = connection_string;
             if (string.IsNullOrEmpty(admin_connection_string))
             {
                 admin_connection_string = connection_string;
             }
 
-            configuration_property_holder.DatabaseName = database_name;
-            configuration_property_holder.ConnectionStringAdmin = admin_connection_string;
+            configurationPropertyHolder.DatabaseName = database_name;
+            configurationPropertyHolder.ConnectionStringAdmin = admin_connection_string;
 
-            sqlite_ado_net_provider_resolver.output_path = configuration_property_holder.OutputPath;
+            sqlite_ado_net_provider_resolver.output_path = configurationPropertyHolder.OutputPath;
 
             set_provider();
         }

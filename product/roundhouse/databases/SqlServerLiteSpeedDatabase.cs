@@ -119,9 +119,9 @@ namespace roundhouse.databases
         //    set { database.repository = value; }
         //}
 
-        public void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
-            database.initialize_connections(configuration_property_holder);
+            database.initialize_connections(configurationPropertyHolder);
         }
 
         public void open_admin_connection()

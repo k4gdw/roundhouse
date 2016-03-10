@@ -49,30 +49,30 @@ namespace roundhouse.databases{
         public override void open_admin_connection(){
             Log.bound_to(this)
                 .log_a_debug_event_containing("Opening admin connection to '{0}'", admin_connection_string);
-            admin_connection = GetAdoNetConnection(admin_connection_string);
-            admin_connection.open();
+            AdminConnection = GetAdoNetConnection(admin_connection_string);
+            AdminConnection.open();
         }
 
         public override void close_admin_connection(){
             Log.bound_to(this).log_a_debug_event_containing("Closing admin connection");
-            if (admin_connection != null){
-                admin_connection.clear_pool();
-                admin_connection.close();
-                admin_connection.Dispose();
-                admin_connection = null;
+            if (AdminConnection != null){
+                AdminConnection.clear_pool();
+                AdminConnection.close();
+                AdminConnection.Dispose();
+                AdminConnection = null;
             }
         }
 
         public override void open_connection(bool withTransaction){
             Log.bound_to(this).log_a_debug_event_containing("Opening connection to '{0}'", connection_string);
-            server_connection = GetAdoNetConnection(connection_string);
-            server_connection.open();
+            ServerConnection = GetAdoNetConnection(connection_string);
+            ServerConnection.open();
             if (withTransaction){
-                Transaction = server_connection.underlying_type().BeginTransaction();
+                Transaction = ServerConnection.underlying_type().BeginTransaction();
             }
 
             set_repository();
-            repository?.start(withTransaction);
+            Repository?.start(withTransaction);
         }
 
         public override void close_connection(){
@@ -81,32 +81,29 @@ namespace roundhouse.databases{
                 Transaction.Commit();
                 Transaction = null;
             }
-            if (repository != null){
-                repository.finish();
-            }
+            Repository?.finish();
 
-            if (server_connection != null){
-                server_connection.clear_pool();
-                server_connection.close();
-                server_connection.Dispose();
-                server_connection = null;
-            }
+            if (ServerConnection == null) return;
+            ServerConnection.clear_pool();
+            ServerConnection.close();
+            ServerConnection.Dispose();
+            ServerConnection = null;
         }
 
         public override void rollback(){
             Log.bound_to(this).log_a_debug_event_containing("Rolling back changes");
-            repository.rollback();
+            Repository.rollback();
 
             if (Transaction != null){
                 //rollback previous transaction
                 Transaction.Rollback();
-                server_connection.close();
+                ServerConnection.close();
 
                 //open a new transaction
-                server_connection.open();
+                ServerConnection.open();
                 //use_database(database_name);
-                Transaction = server_connection.underlying_type().BeginTransaction();
-                repository.start(true);
+                Transaction = ServerConnection.underlying_type().BeginTransaction();
+                Repository.start(true);
             }
         }
 
@@ -145,7 +142,7 @@ namespace roundhouse.databases{
         private void run_command_with(string sqlToRun,
             ConnectionType connectionType,
             IList<IParameter<IDbDataParameter>> parameters){
-            using (var command = setup_database_command(sqlToRun, connectionType, parameters)){
+            using (var command = SetupDatabaseCommand(sqlToRun, connectionType, parameters)){
                 command.ExecuteNonQuery();
                 command.Dispose();
             }
@@ -157,7 +154,7 @@ namespace roundhouse.databases{
             var returnValue = new object();
             if (string.IsNullOrEmpty(sqlToRun)) return returnValue;
 
-            using (var command = setup_database_command(sqlToRun, connectionType, null)){
+            using (var command = SetupDatabaseCommand(sqlToRun, connectionType, null)){
                 returnValue = command.ExecuteScalar();
                 command.Dispose();
             }
@@ -165,27 +162,29 @@ namespace roundhouse.databases{
             return returnValue;
         }
 
-        protected IDbCommand setup_database_command(string sqlToRun,
-            ConnectionType connectionType,
-            IEnumerable<IParameter<IDbDataParameter>> parameters){
+        protected IDbCommand SetupDatabaseCommand(string sqlToRun,
+                                                  ConnectionType connectionType,
+                                                  IEnumerable<IParameter<IDbDataParameter>> parameters){
             IDbCommand command = null;
             switch (connectionType){
                 case ConnectionType.Default:
-                    if (server_connection == null || server_connection.underlying_type().State != ConnectionState.Open){
+                    if (ServerConnection == null || ServerConnection.underlying_type().State != ConnectionState.Open){
                         open_connection(false);
                     }
                     Log.bound_to(this).log_a_debug_event_containing("Setting up command for normal connection");
-                    command = server_connection.underlying_type().CreateCommand();
+                    command = ServerConnection.underlying_type().CreateCommand();
                     command.CommandTimeout = command_timeout;
                     break;
                 case ConnectionType.Admin:
-                    if (admin_connection == null || admin_connection.underlying_type().State != ConnectionState.Open){
+                    if (AdminConnection == null || AdminConnection.underlying_type().State != ConnectionState.Open){
                         open_admin_connection();
                     }
                     Log.bound_to(this).log_a_debug_event_containing("Setting up command for admin connection");
-                    command = admin_connection.underlying_type().CreateCommand();
+                    command = AdminConnection.underlying_type().CreateCommand();
                     command.CommandTimeout = admin_command_timeout;
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(connectionType), connectionType, null);
             }
 
             if (parameters != null){

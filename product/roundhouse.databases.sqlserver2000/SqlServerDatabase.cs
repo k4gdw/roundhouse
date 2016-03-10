@@ -31,7 +31,7 @@ namespace roundhouse.databases.sqlserver2000
                                                       DateTime.UtcNow));
         }
 
-        public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public override void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
             if (!string.IsNullOrEmpty(connection_string))
             {
@@ -75,7 +75,7 @@ namespace roundhouse.databases.sqlserver2000
                 connection_string = build_connection_string(server_name, database_name, connect_options);
             }
 
-            configuration_property_holder.ConnectionString = connection_string;
+            configurationPropertyHolder.ConnectionString = connection_string;
 
             set_provider();
             if (string.IsNullOrEmpty(admin_connection_string))
@@ -83,7 +83,7 @@ namespace roundhouse.databases.sqlserver2000
                 admin_connection_string = Regex.Replace(connection_string, "initial catalog=.*?;", "initial catalog=master;", RegexOptions.IgnoreCase);
                 admin_connection_string = Regex.Replace(admin_connection_string, "database=.*?;", "database=master;", RegexOptions.IgnoreCase);
             }
-            configuration_property_holder.ConnectionStringAdmin = admin_connection_string;
+            configurationPropertyHolder.ConnectionStringAdmin = admin_connection_string;
 
             //set_repository(configuration_property_holder);
         }

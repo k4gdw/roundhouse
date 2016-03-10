@@ -41,7 +41,7 @@ namespace roundhouse.databases.postgresql
             return "";
         }
 
-        public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public override void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
             if (!string.IsNullOrEmpty(connection_string))
             {
@@ -62,8 +62,8 @@ namespace roundhouse.databases.postgresql
 
             server_name = server_name.to_lower();
             database_name = database_name.to_lower();
-            configuration_property_holder.ServerName = server_name;
-            configuration_property_holder.DatabaseName = database_name;
+            configurationPropertyHolder.ServerName = server_name;
+            configurationPropertyHolder.DatabaseName = database_name;
 
 
             if (server_name == infrastructure.ApplicationParameters.default_server_name)
@@ -73,22 +73,22 @@ namespace roundhouse.databases.postgresql
 
             if (string.IsNullOrEmpty(connection_string))
             {
-                InteractivePrompt.write_header(configuration_property_holder);
-                var userName = InteractivePrompt.get_user("postgres", configuration_property_holder);
-                var password = InteractivePrompt.get_password("postgres", configuration_property_holder);
+                InteractivePrompt.write_header(configurationPropertyHolder);
+                var userName = InteractivePrompt.get_user("postgres", configurationPropertyHolder);
+                var password = InteractivePrompt.get_password("postgres", configurationPropertyHolder);
                 InteractivePrompt.write_footer();
 
                 connection_string = build_connection_string(server_name, database_name, userName, password);
             }
 
-            configuration_property_holder.ConnectionString = connection_string;
+            configurationPropertyHolder.ConnectionString = connection_string;
 
             set_provider();
             if (string.IsNullOrEmpty(admin_connection_string))
             {
                 admin_connection_string = Regex.Replace(connection_string, "database=.*?;", "database=postgres;", RegexOptions.IgnoreCase);
             }
-            configuration_property_holder.ConnectionStringAdmin = admin_connection_string;
+            configurationPropertyHolder.ConnectionStringAdmin = admin_connection_string;
         }
 
         public override void set_provider()

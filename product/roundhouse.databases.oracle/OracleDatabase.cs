@@ -34,7 +34,7 @@ namespace roundhouse.databases.oracle
             return "";
         }
 
-        public override void initialize_connections(ConfigurationPropertyHolder configuration_property_holder)
+        public override void initialize_connections(ConfigurationPropertyHolder configurationPropertyHolder)
         {
             if (!string.IsNullOrEmpty(connection_string))
             {
@@ -74,7 +74,7 @@ namespace roundhouse.databases.oracle
                 connection_string = build_connection_string(database_name, connect_options);
             }
 
-            configuration_property_holder.ConnectionString = connection_string;
+            configurationPropertyHolder.ConnectionString = connection_string;
 
             set_provider();
             if (string.IsNullOrEmpty(admin_connection_string))
@@ -83,7 +83,7 @@ namespace roundhouse.databases.oracle
                 admin_connection_string = Regex.Replace(admin_connection_string, "User Id=.*?;", string.Empty);
                 admin_connection_string = Regex.Replace(admin_connection_string, "Password=.*?;", string.Empty);
             }
-            configuration_property_holder.ConnectionStringAdmin = admin_connection_string;
+            configurationPropertyHolder.ConnectionStringAdmin = admin_connection_string;
         }
 
         private static string build_connection_string(string database_name, string connection_options)
@@ -166,7 +166,7 @@ namespace roundhouse.databases.oracle
 
             if (string.IsNullOrEmpty(sqlToRun)) return return_value;
 
-            using (IDbCommand command = setup_database_command(sqlToRun, connectionType, parameters))
+            using (IDbCommand command = SetupDatabaseCommand(sqlToRun, connectionType, parameters))
             {
                 return_value = command.ExecuteScalar();
                 command.Dispose();
@@ -180,7 +180,7 @@ namespace roundhouse.databases.oracle
         /// </summary>
         private IParameter<IDbDataParameter> create_parameter(string name, DbType type, object value, int? size)
         {
-            IDbCommand command = server_connection.underlying_type().CreateCommand();
+            IDbCommand command = ServerConnection.underlying_type().CreateCommand();
             var parameter = command.CreateParameter();
             command.Dispose();
 
