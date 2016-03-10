@@ -36,3 +36,5 @@ Thumbs.db
 # Project Specific
 !gems/bin
 
+*.user
+*.ncrunchsolution
