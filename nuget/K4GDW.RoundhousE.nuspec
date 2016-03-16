@@ -2,7 +2,17 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>K4GDW.RoundhousE</id>
-        <version>1.5.1.0</version>
+        <!-- 
+        Update the version element to reflect any changes following the
+        "semantic versioning" system defined here: http://semver.org
+             
+             <version>major.minor.patch.build</version>
+             
+        For purposes of the nuget package, I use that 4th number for
+        non-code related changes to the nuget package such as corrections
+        to the metadata file or documentation changes.
+        -->
+        <version>1.5.1.2</version>
         <title>K4GDW RoundhousE Database Project</title>
         <authors>Rob Reynolds,Backup Feature by Bryan Johns</authors>
         <owners>Bryan Johns</owners>
@@ -20,23 +30,23 @@ More information about the changes since the previous version can be found at ht
         <tags>Database RoundhousE</tags>
     </metadata>
     <files>
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\AlterDatabase\README.txt" target="content\dbScripts\AlterDatabase\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\down\README.txt" target="content\dbScripts\down\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\functions\README.txt" target="content\dbScripts\functions\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\indexes\README.txt" target="content\dbScripts\indexes\README.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\AlterDatabase\README.txt" target="content\dbScripts\AlterDatabase\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\down\README.txt" target="content\dbScripts\down\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\functions\README.txt" target="content\dbScripts\functions\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\indexes\README.txt" target="content\dbScripts\indexes\PLACEHOLDER.txt" />
         <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\permissions\grant_execute.sql.pp" target="content\dbScripts\permissions\grant_execute.sql.pp" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\permissions\README.txt" target="content\dbScripts\permissions\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\runAfterCreateDatabase\README.txt" target="content\dbScripts\runAfterCreateDatabase\README.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\permissions\README.txt" target="content\dbScripts\permissions\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\runAfterCreateDatabase\README.txt" target="content\dbScripts\runAfterCreateDatabase\PLACEHOLDER.txt" />
         <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\runAfterOtherAnyTimeScripts\login.sql.pp" target="content\dbScripts\runAfterOtherAnyTimeScripts\login.sql.pp" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\runAfterOtherAnyTimeScripts\README.txt" target="content\dbScripts\runAfterOtherAnyTimeScripts\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\RunFirstAfterUpdate\README.txt" target="content\dbScripts\RunFirstAfterUpdate\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\sprocs\README.txt" target="content\dbScripts\sprocs\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\up\README.txt" target="content\dbScripts\up\README.txt" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\views\README.txt" target="content\dbScripts\views\README.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\runAfterOtherAnyTimeScripts\README.txt" target="content\dbScripts\runAfterOtherAnyTimeScripts\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\RunFirstAfterUpdate\README.txt" target="content\dbScripts\RunFirstAfterUpdate\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\sprocs\README.txt" target="content\dbScripts\sprocs\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\up\README.txt" target="content\dbScripts\up\PLACEHOLDER.txt" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\views\README.txt" target="content\dbScripts\views\PLACEHOLDER.txt" />
         <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\dbScripts\custom_db_create.sql" target="content\dbScripts\custom_db_create.sql" />
         <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\Console\rh.exe" target="content\dbDeployment\Console\rh.exe" />
         <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\Console\rh.exe.config" target="content\dbDeployment\Console\rh.exe.config" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\LOCAL.DBDeployment.bat.pp" target="content\dbDeployment\LOCAL.DBDeployment.bat.pp" />
-        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\LOCAL.DBDeployment.DropCreate.bat.pp" target="content\dbDeployment\LOCAL.DBDeployment.DropCreate.bat.pp" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\EXAMPLE.DBDeployment.bat.pp" target="content\dbDeployment\EXAMPLE.DBDeployment.bat.pp" />
+        <file src="..\code_drop\nuget\K4GDW.RoundhousE\content\deployment\EXAMPLE.DBDeployment.DropCreate.bat.pp" target="content\dbDeployment\EXAMPLE.DBDeployment.DropCreate.bat.pp" />
     </files>
 </package>
