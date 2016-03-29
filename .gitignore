@@ -31,7 +31,7 @@ SolutionVersion.vb
 Thumbs.db
 
 # GhostDoc
-*.GhostDoc.xml
+*.GhostDoc.*
 
 # Project Specific
 !gems/bin
